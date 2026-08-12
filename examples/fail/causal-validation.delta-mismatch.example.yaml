@@ -1,20 +1,29 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: causal_validation
 
-validation_id: causal.invalid.delta.001
-target_kata_id: kata.origin-trace-royalty.v1
+validation_id: causal.invalid.delta.002
+target_kata_id: kata.origin-trace-royalty.v2
 target_step_id: trace
 
 method: step_ablation
 
+intervention:
+  kind: remove
+  target: trace
+  alternative: null
+
 baseline_score: 0.90
-ablated_score: 0.60
-contribution_delta: 0.10
+intervention_score: 0.60
+
+# Correct value would be 0.30.
+effect_delta: 0.20
+
+minimum_effect_threshold: 0.15
 confidence: 0.90
 
 conclusion: supported
 
 evidence_trace_ids:
-  - trace.origin-analysis.20260813.001
+  - trace.origin-discovery.20260813.001
 
-created_at: "2026-08-13T06:12:00+09:00"
+created_at: "2026-08-13T08:22:00+09:00"
