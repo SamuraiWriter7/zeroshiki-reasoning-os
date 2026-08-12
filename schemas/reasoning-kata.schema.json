@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "reasoning-kata.schema.json",
-  "title": "ZEROSHIKI ReasoningKATA",
+  "title": "ZEROSHIKI ReasoningKATA v0.2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -12,16 +12,18 @@
     "version",
     "status",
     "activation_conditions",
+    "applicability_policy",
     "reasoning_steps",
-    "failure_boundaries",
+    "failure_boundary_ids",
     "origin_trace_ids",
+    "causal_validation_ids",
     "breathing_profile_id",
     "created_at",
     "updated_at"
   ],
   "properties": {
     "schema_version": {
-      "const": "0.1.0"
+      "const": "0.2.0"
     },
     "record_type": {
       "const": "reasoning_kata"
@@ -76,11 +78,6 @@
           "minLength": 1,
           "maxLength": 120
         },
-        "minimum_match_score": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
-        },
         "required_evidence_classes": {
           "type": "array",
           "uniqueItems": true,
@@ -89,6 +86,28 @@
             "minLength": 1,
             "maxLength": 120
           }
+        }
+      }
+    },
+    "applicability_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_match_score",
+        "require_all_conditions",
+        "boundary_precedence"
+      ],
+      "properties": {
+        "minimum_match_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "require_all_conditions": {
+          "type": "boolean"
+        },
+        "boundary_precedence": {
+          "const": "override_match"
         }
       }
     },
@@ -127,14 +146,13 @@
         }
       }
     },
-    "failure_boundaries": {
+    "failure_boundary_ids": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 500
+        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
       }
     },
     "origin_trace_ids": {
@@ -146,12 +164,14 @@
         "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
       }
     },
-    "causal_validation_id": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    "causal_validation_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      }
     },
     "breathing_profile_id": {
       "type": "string",
