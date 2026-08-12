@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "breathing-profile.schema.json",
+  "title": "ZEROSHIKI BreathingProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "profile_id",
+    "level",
+    "reasoning_budget_class",
+    "cache_policy",
+    "fallback_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "record_type": {
+      "const": "breathing_profile"
+    },
+    "profile_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "rest",
+        "kata",
+        "deep"
+      ]
+    },
+    "reasoning_budget_class": {
+      "type": "string",
+      "enum": [
+        "minimal",
+        "bounded",
+        "extended"
+      ]
+    },
+    "token_budget": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "latency_budget_ms": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "cache_policy": {
+      "type": "string",
+      "enum": [
+        "prefer_reuse",
+        "allow_reuse",
+        "bypass"
+      ]
+    },
+    "fallback_policy": {
+      "type": "string",
+      "enum": [
+        "escalate_to_kata",
+        "escalate_to_deep",
+        "fail_closed"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 800
+    }
+  }
+}
