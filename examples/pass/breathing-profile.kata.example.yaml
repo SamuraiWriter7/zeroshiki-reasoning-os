@@ -1,4 +1,4 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: breathing_profile
 
 profile_id: breathe.kata.default.v1
@@ -12,4 +12,6 @@ latency_budget_ms: 2500
 cache_policy: prefer_reuse
 fallback_policy: escalate_to_deep
 
-description: Default bounded profile for reuse of a known Reasoning KATA.
+description: >
+  Default bounded profile for reuse of a known
+  Reasoning KATA.
