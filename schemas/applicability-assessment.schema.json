@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "applicability-assessment.schema.json",
+  "title": "ZEROSHIKI ApplicabilityAssessment v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "assessment_id",
+    "kata_id",
+    "input_summary",
+    "intent_match_score",
+    "minimum_match_score",
+    "required_conditions",
+    "boundary_checks",
+    "decision",
+    "selected_breathing_level",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "record_type": {
+      "const": "applicability_assessment"
+    },
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "kata_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "input_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "intent_match_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "minimum_match_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "required_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "condition",
+          "met",
+          "evidence_summary"
+        ],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "met": {
+            "type": "boolean"
+          },
+          "evidence_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "boundary_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "boundary_id",
+          "matched",
+          "evidence_summary"
+        ],
+        "properties": {
+          "boundary_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+          },
+          "matched": {
+            "type": "boolean"
+          },
+          "evidence_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "reuse",
+        "escalate",
+        "reject"
+      ]
+    },
+    "selected_breathing_level": {
+      "type": "string",
+      "enum": [
+        "kata",
+        "deep",
+        "none"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
