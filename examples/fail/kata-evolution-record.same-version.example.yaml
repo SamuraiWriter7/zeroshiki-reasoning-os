@@ -1,11 +1,11 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: kata_evolution_record
 
-evolution_id: evolution.invalid.same-version.001
-kata_id: kata.origin-trace-royalty.v1
+evolution_id: evolution.invalid.same-version.002
+kata_id: kata.origin-trace-royalty.v2
 
-from_version: "1.0.0"
-to_version: "1.0.0"
+from_version: "2.0.0"
+to_version: "2.0.0"
 
 reason: manual_revision
 
@@ -13,7 +13,10 @@ evidence_trace_ids:
   - trace.origin-analysis.20260813.001
 
 causal_validation_ids:
-  - causal.origin-analysis.001
+  - causal.origin-analysis.002
+
+applicability_assessment_ids:
+  - applicability.origin-analysis.001
 
 changed_steps:
   added: []
@@ -22,6 +25,6 @@ changed_steps:
   removed: []
 
 reversible: true
-rollback_target_version: "1.0.0"
+rollback_target_version: "2.0.0"
 
-created_at: "2026-08-13T06:13:00+09:00"
+created_at: "2026-08-13T08:23:00+09:00"
