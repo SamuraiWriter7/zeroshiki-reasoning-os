@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "kata-evolution-record.schema.json",
-  "title": "ZEROSHIKI KataEvolutionRecord",
+  "title": "ZEROSHIKI KataEvolutionRecord v0.2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,6 +14,7 @@
     "reason",
     "evidence_trace_ids",
     "causal_validation_ids",
+    "applicability_assessment_ids",
     "changed_steps",
     "reversible",
     "rollback_target_version",
@@ -21,18 +22,16 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "0.1.0"
+      "const": "0.2.0"
     },
     "record_type": {
       "const": "kata_evolution_record"
     },
     "evolution_id": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      "type": "string"
     },
     "kata_id": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      "type": "string"
     },
     "from_version": {
       "type": "string",
@@ -48,6 +47,7 @@
         "repeated_success",
         "causal_validation",
         "failure_boundary_update",
+        "applicability_update",
         "pruning",
         "manual_revision"
       ]
@@ -55,24 +55,26 @@
     "evidence_trace_ids": {
       "type": "array",
       "minItems": 1,
-      "uniqueItems": true,
       "items": {
-        "type": "string",
-        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        "type": "string"
       }
     },
     "causal_validation_ids": {
       "type": "array",
       "minItems": 1,
-      "uniqueItems": true,
       "items": {
-        "type": "string",
-        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        "type": "string"
+      }
+    },
+    "applicability_assessment_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
       }
     },
     "changed_steps": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "added",
         "modified",
@@ -81,29 +83,20 @@
       "properties": {
         "added": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
+            "type": "string"
           }
         },
         "modified": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
+            "type": "string"
           }
         },
         "removed": {
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
+            "type": "string"
           }
         }
       }
@@ -112,8 +105,7 @@
       "const": true
     },
     "rollback_target_version": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "type": "string"
     },
     "created_at": {
       "type": "string",
