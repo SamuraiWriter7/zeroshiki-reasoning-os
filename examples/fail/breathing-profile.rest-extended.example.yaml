@@ -1,0 +1,15 @@
+schema_version: "0.1.0"
+record_type: breathing_profile
+
+profile_id: breathe.invalid.rest-extended.v1
+
+level: rest
+reasoning_budget_class: extended
+
+token_budget: 5000
+latency_budget_ms: 10000
+
+cache_policy: allow_reuse
+fallback_policy: escalate_to_deep
+
+description: Invalid because a rest profile declares an extended reasoning budget.
