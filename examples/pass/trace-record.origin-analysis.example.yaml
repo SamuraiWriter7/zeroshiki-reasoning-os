@@ -1,35 +1,49 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: trace_record
 
 trace_id: trace.origin-analysis.20260813.001
-parent_trace_id: null
+parent_trace_id: trace.origin-discovery.20260813.001
 
-input_summary: Analyze a monetization-policy change using an Origin-Trace-Royalty structural lens.
+input_summary: >
+  Analyze a monetization-policy change using the
+  Origin-Trace-Royalty structural KATA.
 
 execution_mode: kata
-applied_kata_id: kata.origin-trace-royalty.v1
+
+applied_kata_id: kata.origin-trace-royalty.v2
+applicability_assessment_id: applicability.origin-analysis.001
 breathing_profile_id: breathe.kata.default.v1
 
 execution_steps:
   - step_id: origin
     action: Identify Origin
-    input_summary: Policy description and source statement.
-    output_summary: The primary origin boundary was separated from derivative reuse.
+    input_summary: >
+      Primary policy source and provenance evidence.
+    output_summary: >
+      The primary origin was separated from
+      derivative reuse.
     validation_result: pass
 
   - step_id: trace
     action: Verify Trace
-    input_summary: Available provenance and transformation evidence.
-    output_summary: Auditable transformation evidence was identified.
+    input_summary: >
+      Available provenance and transformation evidence.
+    output_summary: >
+      Auditable transformation evidence was identified.
     validation_result: pass
 
   - step_id: royalty
     action: Map Value Return
-    input_summary: Reward conditions and contribution relationship.
-    output_summary: The value-return path was mapped to attributed contribution.
+    input_summary: >
+      Reward conditions and contribution relationship.
+    output_summary: >
+      The value-return path was mapped to
+      attributed contribution.
     validation_result: pass
 
-outcome_summary: The policy can be analyzed as an origin-sensitive value-return mechanism.
+outcome_summary: >
+  The policy can be analyzed as an origin-sensitive
+  value-return mechanism.
 
 resource_metrics:
   input_tokens: 420
@@ -38,4 +52,4 @@ resource_metrics:
   latency_ms: 620
   cache_outcome: hit
 
-created_at: "2026-08-13T05:50:00+09:00"
+created_at: "2026-08-13T08:15:00+09:00"
