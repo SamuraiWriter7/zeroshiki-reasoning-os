@@ -1,13 +1,17 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: trace_record
 
-trace_id: trace.invalid.kata-without-id.001
+trace_id: trace.invalid.kata-without-id.002
 parent_trace_id: null
 
-input_summary: A KATA execution is declared without identifying the KATA.
+input_summary: >
+  KATA execution is declared without identifying
+  the KATA being executed.
 
 execution_mode: kata
+
 applied_kata_id: null
+applicability_assessment_id: applicability.origin-analysis.001
 breathing_profile_id: breathe.kata.default.v1
 
 execution_steps:
@@ -17,9 +21,9 @@ execution_steps:
     output_summary: Output.
     validation_result: pass
 
-outcome_summary: Invalid semantic state.
+outcome_summary: Invalid KATA execution state.
 
 resource_metrics:
   cache_outcome: unknown
 
-created_at: "2026-08-13T06:11:00+09:00"
+created_at: "2026-08-13T08:25:00+09:00"
