@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "failure-boundary.schema.json",
+  "title": "ZEROSHIKI FailureBoundary v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "boundary_id",
+    "name",
+    "condition_type",
+    "condition",
+    "severity",
+    "on_match",
+    "evidence_requirement",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "record_type": {
+      "const": "failure_boundary"
+    },
+    "boundary_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "condition_type": {
+      "type": "string",
+      "enum": [
+        "missing_evidence",
+        "domain_mismatch",
+        "causal_uncertainty",
+        "freshness_limit",
+        "safety_constraint",
+        "custom"
+      ]
+    },
+    "condition": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "warning",
+        "blocker"
+      ]
+    },
+    "on_match": {
+      "type": "string",
+      "enum": [
+        "escalate_to_deep",
+        "reject_reuse",
+        "fail_closed"
+      ]
+    },
+    "evidence_requirement": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 800
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
