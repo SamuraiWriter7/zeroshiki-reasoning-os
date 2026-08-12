@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reasoning-kata.schema.json",
+  "title": "ZEROSHIKI ReasoningKATA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "kata_id",
+    "name",
+    "version",
+    "status",
+    "activation_conditions",
+    "reasoning_steps",
+    "failure_boundaries",
+    "origin_trace_ids",
+    "breathing_profile_id",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "record_type": {
+      "const": "reasoning_kata"
+    },
+    "kata_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "experimental",
+        "observed",
+        "validated",
+        "stable",
+        "deprecated"
+      ]
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "activation_conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intent_patterns"
+      ],
+      "properties": {
+        "intent_patterns": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "minimum_match_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "required_evidence_classes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      }
+    },
+    "reasoning_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "action",
+          "instruction",
+          "validation_criteria"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1200
+          },
+          "validation_criteria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          }
+        }
+      }
+    },
+    "failure_boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "origin_trace_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      }
+    },
+    "causal_validation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "breathing_profile_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "parent_kata_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
