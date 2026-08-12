@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "trace-record.schema.json",
-  "title": "ZEROSHIKI TraceRecord",
+  "title": "ZEROSHIKI TraceRecord v0.2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,13 +11,15 @@
     "input_summary",
     "execution_mode",
     "applied_kata_id",
+    "applicability_assessment_id",
+    "breathing_profile_id",
     "execution_steps",
     "outcome_summary",
     "created_at"
   ],
   "properties": {
     "schema_version": {
-      "const": "0.1.0"
+      "const": "0.2.0"
     },
     "record_type": {
       "const": "trace_record"
@@ -30,8 +32,7 @@
       "type": [
         "string",
         "null"
-      ],
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      ]
     },
     "input_summary": {
       "type": "string",
@@ -50,15 +51,19 @@
       "type": [
         "string",
         "null"
-      ],
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      ]
+    },
+    "applicability_assessment_id": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "breathing_profile_id": {
       "type": [
         "string",
         "null"
-      ],
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      ]
     },
     "execution_steps": {
       "type": "array",
@@ -75,23 +80,16 @@
         ],
         "properties": {
           "step_id": {
-            "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"
+            "type": "string"
           },
           "action": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 160
+            "type": "string"
           },
           "input_summary": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
+            "type": "string"
           },
           "output_summary": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1600
+            "type": "string"
           },
           "validation_result": {
             "type": "string",
@@ -106,8 +104,7 @@
     },
     "outcome_summary": {
       "type": "string",
-      "minLength": 1,
-      "maxLength": 2000
+      "minLength": 1
     },
     "resource_metrics": {
       "type": "object",
