@@ -1,25 +1,40 @@
-schema_version: "0.1.0"
+schema_version: "0.2.0"
 record_type: reasoning_kata
 
-kata_id: kata.invalid.no-origin.v1
+kata_id: kata.invalid.no-origin.v2
 name: Invalid KATA Without Origin Trace
-version: "1.0.0"
+version: "2.0.0"
 status: experimental
+domain: ecosystem_analysis
 
 activation_conditions:
   intent_patterns:
     - structural_analysis
 
+applicability_policy:
+  minimum_match_score: 0.65
+  require_all_conditions: true
+  boundary_precedence: override_match
+
 reasoning_steps:
   - step_id: inspect
     action: Inspect Structure
-    instruction: Inspect the structure.
-    validation_criteria: A structure was identified.
+    instruction: >
+      Inspect the target structure.
+    validation_criteria: >
+      A reusable structure must be identified.
 
-failure_boundaries:
-  - Do not use without evidence.
+failure_boundary_ids:
+  - boundary.origin.unverified.v1
+
+# Intentionally missing:
+# origin_trace_ids
+
+causal_validation_ids:
+  - causal.origin-analysis.002
 
 breathing_profile_id: breathe.kata.default.v1
+parent_kata_id: null
 
-created_at: "2026-08-13T06:10:00+09:00"
-updated_at: "2026-08-13T06:10:00+09:00"
+created_at: "2026-08-13T08:24:00+09:00"
+updated_at: "2026-08-13T08:24:00+09:00"
