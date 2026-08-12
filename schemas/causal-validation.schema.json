@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "causal-validation.schema.json",
-  "title": "ZEROSHIKI CausalValidation",
+  "title": "ZEROSHIKI CausalValidation v0.2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -10,13 +10,15 @@
     "validation_id",
     "target_kata_id",
     "method",
+    "intervention",
+    "minimum_effect_threshold",
     "conclusion",
     "evidence_trace_ids",
     "created_at"
   ],
   "properties": {
     "schema_version": {
-      "const": "0.1.0"
+      "const": "0.2.0"
     },
     "record_type": {
       "const": "causal_validation"
@@ -47,6 +49,38 @@
         "not_run"
       ]
     },
+    "intervention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "target"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "remove",
+            "replace",
+            "disable",
+            "compare",
+            "none"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "alternative": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        }
+      }
+    },
     "baseline_score": {
       "type": [
         "number",
@@ -55,7 +89,7 @@
       "minimum": 0,
       "maximum": 1
     },
-    "ablated_score": {
+    "intervention_score": {
       "type": [
         "number",
         "null"
@@ -63,12 +97,17 @@
       "minimum": 0,
       "maximum": 1
     },
-    "contribution_delta": {
+    "effect_delta": {
       "type": [
         "number",
         "null"
       ],
       "minimum": -1,
+      "maximum": 1
+    },
+    "minimum_effect_threshold": {
+      "type": "number",
+      "minimum": 0,
       "maximum": 1
     },
     "confidence": {
