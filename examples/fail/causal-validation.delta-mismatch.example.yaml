@@ -1,0 +1,20 @@
+schema_version: "0.1.0"
+record_type: causal_validation
+
+validation_id: causal.invalid.delta.001
+target_kata_id: kata.origin-trace-royalty.v1
+target_step_id: trace
+
+method: step_ablation
+
+baseline_score: 0.90
+ablated_score: 0.60
+contribution_delta: 0.10
+confidence: 0.90
+
+conclusion: supported
+
+evidence_trace_ids:
+  - trace.origin-analysis.20260813.001
+
+created_at: "2026-08-13T06:12:00+09:00"
