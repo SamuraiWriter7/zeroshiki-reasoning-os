@@ -1,0 +1,52 @@
+schema_version: "0.1.0"
+record_type: reasoning_kata
+
+kata_id: kata.origin-trace-royalty.v1
+name: Origin-Trace-Royalty Structural Analysis
+version: "1.0.0"
+status: validated
+domain: ecosystem_analysis
+
+activation_conditions:
+  intent_patterns:
+    - structural_analysis
+    - monetization_shift
+    - ecosystem_change
+
+  domain: ecosystem_analysis
+  minimum_match_score: 0.65
+
+  required_evidence_classes:
+    - primary_source
+    - policy_or_system_change
+
+reasoning_steps:
+  - step_id: origin
+    action: Identify Origin
+    instruction: Identify the primary source of the core value, data, or contribution before analyzing derivatives.
+    validation_criteria: The identified source must be distinguishable from later derivative use.
+
+  - step_id: trace
+    action: Verify Trace
+    instruction: Determine whether transformation, provenance, or contribution can be meaningfully traced.
+    validation_criteria: The claimed transformation or contribution must have auditable evidence.
+
+  - step_id: royalty
+    action: Map Value Return
+    instruction: Evaluate whether value return or settlement is connected to attributed contribution.
+    validation_criteria: The return mechanism must be explicitly linked to contribution or provenance.
+
+failure_boundaries:
+  - Do not infer origin when only derivative or secondary evidence is available.
+  - Escalate when attribution cannot be distinguished from correlation.
+  - Do not claim a royalty relationship when no value-return mechanism exists.
+
+origin_trace_ids:
+  - trace.origin-analysis.20260813.001
+
+causal_validation_id: causal.origin-analysis.001
+breathing_profile_id: breathe.kata.default.v1
+parent_kata_id: null
+
+created_at: "2026-08-13T06:00:00+09:00"
+updated_at: "2026-08-13T06:00:00+09:00"
