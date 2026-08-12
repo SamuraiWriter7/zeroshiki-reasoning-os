@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "causal-validation.schema.json",
+  "title": "ZEROSHIKI CausalValidation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "validation_id",
+    "target_kata_id",
+    "method",
+    "conclusion",
+    "evidence_trace_ids",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "record_type": {
+      "const": "causal_validation"
+    },
+    "validation_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "target_kata_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "target_step_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "leave_one_out",
+        "step_ablation",
+        "kata_ablation",
+        "alternative_kata",
+        "manual_review",
+        "not_run"
+      ]
+    },
+    "baseline_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "ablated_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "contribution_delta": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": -1,
+      "maximum": 1
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "conclusion": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "inconclusive",
+        "rejected",
+        "not_tested"
+      ]
+    },
+    "evidence_trace_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1600
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
