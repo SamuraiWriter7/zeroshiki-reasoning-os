@@ -1,0 +1,34 @@
+schema_version: "0.2.0"
+record_type: applicability_assessment
+
+assessment_id: applicability.origin-analysis.001
+kata_id: kata.origin-trace-royalty.v2
+
+input_summary: >
+  Analyze a monetization-policy change with clear
+  primary-source evidence and auditable provenance.
+
+intent_match_score: 0.86
+minimum_match_score: 0.65
+
+required_conditions:
+  - condition: Intent matches structural analysis.
+    met: true
+    evidence_summary: >
+      The request explicitly asks for structural analysis.
+
+  - condition: Primary-source evidence is available.
+    met: true
+    evidence_summary: >
+      A primary policy source is available for inspection.
+
+boundary_checks:
+  - boundary_id: boundary.origin.unverified.v1
+    matched: false
+    evidence_summary: >
+      Primary-source evidence resolves the origin boundary.
+
+decision: reuse
+selected_breathing_level: kata
+
+created_at: "2026-08-13T08:14:00+09:00"
