@@ -1,0 +1,36 @@
+schema_version: "0.4.0"
+record_type: kata_selection_assessment
+
+selection_id: selection.invalid.maturity-override.001
+
+input_summary: >
+  Invalid selection where an inapplicable
+  K5 KATA is selected because of maturity alone.
+
+strategy: highest_maturity
+
+candidates:
+  - kata_ref:
+      kata_id: kata.inapplicable.k5
+      version: "1.0.0"
+
+    applicability_assessment_id: applicability.invalid.k5.001
+
+    intent_match_score: 0.20
+    maturity_level: K5
+    compute_cost_class: extended
+    priority_score: 0.95
+
+    selected: true
+    rejection_reason: null
+
+selected_kata_refs:
+  - kata_id: kata.inapplicable.k5
+    version: "1.0.0"
+
+decision: single_kata
+
+decision_rationale: >
+  Selected solely because maturity was K5.
+
+created_at: "2026-08-13T10:25:00+09:00"
