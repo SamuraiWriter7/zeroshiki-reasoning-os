@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-maturity-assessment.schema.json",
+  "title": "ZEROSHIKI KataMaturityAssessment v0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "assessment_id",
+    "kata_ref",
+    "previous_level",
+    "level",
+    "evidence",
+    "evidence_trace_ids",
+    "causal_validation_ids",
+    "context_ids",
+    "decision",
+    "created_at"
+  ],
+  "$defs": {
+    "kata_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kata_id",
+        "version"
+      ],
+      "properties": {
+        "kata_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "record_type": {
+      "const": "kata_maturity_assessment"
+    },
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "kata_ref": {
+      "$ref": "#/$defs/kata_ref"
+    },
+    "previous_level": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "K0",
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        null
+      ]
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "K0",
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_execution",
+        "repeated_execution",
+        "causal_validation_supported",
+        "cross_context_validation_supported",
+        "regression_stable"
+      ],
+      "properties": {
+        "observed_execution": {
+          "type": "boolean"
+        },
+        "repeated_execution": {
+          "type": "boolean"
+        },
+        "causal_validation_supported": {
+          "type": "boolean"
+        },
+        "cross_context_validation_supported": {
+          "type": "boolean"
+        },
+        "regression_stable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evidence_trace_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "causal_validation_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "context_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "promote",
+        "retain",
+        "demote"
+      ]
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1600
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
