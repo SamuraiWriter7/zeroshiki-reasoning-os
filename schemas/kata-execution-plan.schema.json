@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-execution-plan.schema.json",
+  "title": "ZEROSHIKI KataExecutionPlan v0.4",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "record_type",
+    "plan_id",
+    "selection_id",
+    "conflict_assessment_ids",
+    "execution_mode",
+    "stages",
+    "fallback_policy",
+    "breathing_level",
+    "created_at"
+  ],
+
+  "$defs": {
+    "kata_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kata_id",
+        "version"
+      ],
+      "properties": {
+        "kata_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  },
+
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+
+    "record_type": {
+      "const": "kata_execution_plan"
+    },
+
+    "plan_id": {
+      "type": "string"
+    },
+
+    "selection_id": {
+      "type": "string"
+    },
+
+    "conflict_assessment_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "execution_mode": {
+      "type": "string",
+      "enum": [
+        "single",
+        "sequential",
+        "parallel",
+        "gated",
+        "hybrid"
+      ]
+    },
+
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+
+        "required": [
+          "stage_id",
+          "order",
+          "mode",
+          "kata_refs",
+          "required"
+        ],
+
+        "properties": {
+          "stage_id": {
+            "type": "string"
+          },
+
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+
+          "mode": {
+            "type": "string",
+            "enum": [
+              "single",
+              "parallel",
+              "gate"
+            ]
+          },
+
+          "kata_refs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/kata_ref"
+            }
+          },
+
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+
+    "fallback_policy": {
+      "type": "string",
+      "enum": [
+        "continue_remaining",
+        "escalate_to_deep",
+        "fail_closed",
+        "manual_review"
+      ]
+    },
+
+    "breathing_level": {
+      "type": "string",
+      "enum": [
+        "kata",
+        "deep"
+      ]
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
