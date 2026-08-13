@@ -1,0 +1,26 @@
+schema_version: "0.3.0"
+record_type: kata_lineage
+
+lineage_id: lineage.invalid.self-parent.001
+
+kata_ref:
+  kata_id: kata.invalid.self-parent
+  version: "1.0.0"
+
+root_kata_refs:
+  - kata_id: kata.invalid.self-parent
+    version: "1.0.0"
+
+parent_kata_refs:
+  - kata_id: kata.invalid.self-parent
+    version: "1.0.0"
+
+generation: 1
+derivation_type: refinement
+
+inherited_step_ids:
+  - inspect
+
+introduced_step_ids: []
+
+created_at: "2026-08-13T08:50:00+09:00"
