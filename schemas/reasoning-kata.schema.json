@@ -1,9 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "reasoning-kata.schema.json",
-  "title": "ZEROSHIKI ReasoningKATA v0.2",
+  "title": "ZEROSHIKI ReasoningKATA v0.3",
   "type": "object",
   "additionalProperties": false,
+
   "required": [
     "schema_version",
     "record_type",
@@ -18,29 +19,38 @@
     "origin_trace_ids",
     "causal_validation_ids",
     "breathing_profile_id",
+    "lineage_id",
+    "composition_id",
+    "maturity_assessment_id",
     "created_at",
     "updated_at"
   ],
+
   "properties": {
     "schema_version": {
-      "const": "0.2.0"
+      "const": "0.3.0"
     },
+
     "record_type": {
       "const": "reasoning_kata"
     },
+
     "kata_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
     },
+
     "name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 160
     },
+
     "version": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
+
     "status": {
       "type": "string",
       "enum": [
@@ -51,36 +61,44 @@
         "deprecated"
       ]
     },
+
     "domain": {
       "type": "string",
       "minLength": 1,
       "maxLength": 120
     },
+
     "activation_conditions": {
       "type": "object",
       "additionalProperties": false,
+
       "required": [
         "intent_patterns"
       ],
+
       "properties": {
         "intent_patterns": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
+
           "items": {
             "type": "string",
             "minLength": 1,
             "maxLength": 120
           }
         },
+
         "domain": {
           "type": "string",
           "minLength": 1,
           "maxLength": 120
         },
+
         "required_evidence_classes": {
           "type": "array",
           "uniqueItems": true,
+
           "items": {
             "type": "string",
             "minLength": 1,
@@ -89,55 +107,67 @@
         }
       }
     },
+
     "applicability_policy": {
       "type": "object",
       "additionalProperties": false,
+
       "required": [
         "minimum_match_score",
         "require_all_conditions",
         "boundary_precedence"
       ],
+
       "properties": {
         "minimum_match_score": {
           "type": "number",
           "minimum": 0,
           "maximum": 1
         },
+
         "require_all_conditions": {
           "type": "boolean"
         },
+
         "boundary_precedence": {
           "const": "override_match"
         }
       }
     },
+
     "reasoning_steps": {
       "type": "array",
       "minItems": 1,
+
       "items": {
         "type": "object",
         "additionalProperties": false,
+
         "required": [
           "step_id",
           "action",
           "instruction",
           "validation_criteria"
         ],
+
         "properties": {
           "step_id": {
             "type": "string",
             "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"
           },
+
           "action": {
             "type": "string",
             "minLength": 1,
             "maxLength": 160
           },
+
           "instruction": {
             "type": "string",
             "minLength": 1,
             "maxLength": 1200
           },
+
           "validation_criteria": {
             "type": "string",
             "minLength": 1,
@@ -146,48 +176,68 @@
         }
       }
     },
+
     "failure_boundary_ids": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
+
       "items": {
         "type": "string",
         "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
       }
     },
+
     "origin_trace_ids": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
+
       "items": {
         "type": "string",
         "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
       }
     },
+
     "causal_validation_ids": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
+
       "items": {
         "type": "string",
         "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
       }
     },
+
     "breathing_profile_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
     },
-    "parent_kata_id": {
+
+    "lineage_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+
+    "composition_id": {
       "type": [
         "string",
         "null"
       ],
       "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
     },
+
+    "maturity_assessment_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+
     "created_at": {
       "type": "string",
       "format": "date-time"
     },
+
     "updated_at": {
       "type": "string",
       "format": "date-time"
