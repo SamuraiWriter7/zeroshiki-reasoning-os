@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-composition.schema.json",
+  "title": "ZEROSHIKI KataComposition v0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "composition_id",
+    "name",
+    "output_kata_ref",
+    "components",
+    "execution_strategy",
+    "conflict_policy",
+    "merge_policy",
+    "fallback_policy",
+    "created_at"
+  ],
+  "$defs": {
+    "kata_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kata_id",
+        "version"
+      ],
+      "properties": {
+        "kata_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "record_type": {
+      "const": "kata_composition"
+    },
+    "composition_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "output_kata_ref": {
+      "$ref": "#/$defs/kata_ref"
+    },
+    "components": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kata_ref",
+          "role",
+          "order",
+          "required"
+        ],
+        "properties": {
+          "kata_ref": {
+            "$ref": "#/$defs/kata_ref"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "execution_strategy": {
+      "type": "string",
+      "enum": [
+        "sequential",
+        "parallel",
+        "gated",
+        "hybrid"
+      ]
+    },
+    "conflict_policy": {
+      "type": "string",
+      "enum": [
+        "reject",
+        "escalate_to_deep",
+        "prefer_higher_maturity",
+        "manual_review"
+      ]
+    },
+    "merge_policy": {
+      "type": "string",
+      "enum": [
+        "ordered_merge",
+        "aggregate",
+        "consensus",
+        "first_valid"
+      ]
+    },
+    "fallback_policy": {
+      "type": "string",
+      "enum": [
+        "degrade_gracefully",
+        "escalate_to_deep",
+        "fail_closed"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
