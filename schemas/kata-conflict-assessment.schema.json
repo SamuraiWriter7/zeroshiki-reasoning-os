@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-conflict-assessment.schema.json",
+  "title": "ZEROSHIKI KataConflictAssessment v0.4",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "schema_version",
+    "record_type",
+    "conflict_id",
+    "selection_id",
+    "kata_refs",
+    "detected",
+    "conflict_type",
+    "resolution_policy",
+    "winner_kata_ref",
+    "evidence_summary",
+    "created_at"
+  ],
+
+  "$defs": {
+    "kata_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kata_id",
+        "version"
+      ],
+      "properties": {
+        "kata_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  },
+
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+
+    "record_type": {
+      "const": "kata_conflict_assessment"
+    },
+
+    "conflict_id": {
+      "type": "string"
+    },
+
+    "selection_id": {
+      "type": "string"
+    },
+
+    "kata_refs": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/kata_ref"
+      }
+    },
+
+    "detected": {
+      "type": "boolean"
+    },
+
+    "conflict_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "step_order",
+        "contradictory_output",
+        "boundary_collision",
+        "resource_contention",
+        "duplicated_scope",
+        "policy_conflict"
+      ]
+    },
+
+    "resolution_policy": {
+      "type": "string",
+      "enum": [
+        "not_applicable",
+        "prefer_higher_maturity",
+        "prefer_lower_cost",
+        "ordered_precedence",
+        "merge_if_compatible",
+        "escalate_to_deep",
+        "reject_all",
+        "manual_review"
+      ]
+    },
+
+    "winner_kata_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/kata_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+
+    "evidence_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1600
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
