@@ -1,0 +1,30 @@
+schema_version: "0.3.0"
+record_type: kata_maturity_assessment
+
+assessment_id: maturity.invalid.k3-no-causal.001
+
+kata_ref:
+  kata_id: kata.invalid.maturity
+  version: "1.0.0"
+
+previous_level: K2
+level: K3
+
+evidence:
+  observed_execution: true
+  repeated_execution: true
+  causal_validation_supported: false
+  cross_context_validation_supported: false
+  regression_stable: false
+
+evidence_trace_ids:
+  - trace.example.001
+
+causal_validation_ids: []
+
+context_ids:
+  - test
+
+decision: promote
+
+created_at: "2026-08-13T08:52:00+09:00"
