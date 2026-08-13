@@ -1,0 +1,32 @@
+schema_version: "0.3.0"
+record_type: kata_composition
+
+composition_id: composition.invalid.self-component.001
+
+name: Invalid Recursive Composition
+
+output_kata_ref:
+  kata_id: kata.composite.invalid
+  version: "1.0.0"
+
+components:
+  - kata_ref:
+      kata_id: kata.composite.invalid
+      version: "1.0.0"
+    role: self
+    order: 1
+    required: true
+
+  - kata_ref:
+      kata_id: kata.other
+      version: "1.0.0"
+    role: other
+    order: 2
+    required: true
+
+execution_strategy: sequential
+conflict_policy: reject
+merge_policy: ordered_merge
+fallback_policy: fail_closed
+
+created_at: "2026-08-13T08:51:00+09:00"
