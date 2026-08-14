@@ -1,0 +1,41 @@
+schema_version: "0.5.0"
+record_type: conformance_profile
+
+profile_id: zeroshiki.core.v0.5
+profile_version: "1.0.0"
+target_spec_version: "0.5.0"
+
+strictness: core
+
+required_record_types:
+  - reasoning_kata
+  - trace_record
+  - applicability_assessment
+  - kata_lineage
+  - kata_maturity_assessment
+  - kata_interface_contract
+
+required_checks:
+  - schema
+  - semantic
+  - trace
+  - applicability
+  - lineage
+  - maturity
+  - interface
+
+required_invariants:
+  - Z1
+  - Z4
+  - Z7
+  - Z9
+  - Z12
+  - Z21
+  - Z22
+  - Z27
+  - Z28
+
+allow_extensions: true
+compatibility_policy: declared_mapping
+
+created_at: "2026-08-14T11:00:00+09:00"
