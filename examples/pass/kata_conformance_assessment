@@ -1,0 +1,58 @@
+schema_version: "0.5.0"
+record_type: kata_conformance_assessment
+
+assessment_id: conformance.origin-trace-royalty.001
+
+kata_ref:
+  kata_id: kata.origin-trace-royalty.v2
+  version: "2.0.0"
+
+profile_id: zeroshiki.core.v0.5
+interface_id: interface.origin-trace-royalty.v1
+
+checks:
+  - check_id: schema
+    status: pass
+    evidence_ids:
+      - reasoning-kata.schema.json
+
+  - check_id: semantic
+    status: pass
+    evidence_ids:
+      - validator.v0.5
+
+  - check_id: trace
+    status: pass
+    evidence_ids:
+      - trace.origin-analysis.20260813.001
+
+  - check_id: applicability
+    status: pass
+    evidence_ids:
+      - applicability.origin-analysis.001
+
+  - check_id: lineage
+    status: pass
+    evidence_ids:
+      - lineage.origin-trace-royalty.001
+
+  - check_id: maturity
+    status: pass
+    evidence_ids:
+      - maturity.origin-trace-royalty.001
+
+  - check_id: interface
+    status: pass
+    evidence_ids:
+      - interface.origin-trace-royalty.v1
+
+evidence_trace_ids:
+  - trace.origin-analysis.20260813.001
+
+result: conformant
+
+notes: >
+  The KATA satisfies the ZEROSHIKI Core v0.5
+  conformance profile.
+
+created_at: "2026-08-14T11:04:00+09:00"
