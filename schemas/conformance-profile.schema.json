@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "conformance-profile.schema.json",
+  "title": "ZEROSHIKI ConformanceProfile v0.5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "profile_id",
+    "profile_version",
+    "target_spec_version",
+    "strictness",
+    "required_record_types",
+    "required_checks",
+    "required_invariants",
+    "allow_extensions",
+    "compatibility_policy",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "record_type": {
+      "const": "conformance_profile"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "profile_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "target_spec_version": {
+      "const": "0.5.0"
+    },
+    "strictness": {
+      "type": "string",
+      "enum": [
+        "core",
+        "strict"
+      ]
+    },
+    "required_record_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_checks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "schema",
+          "semantic",
+          "trace",
+          "applicability",
+          "lineage",
+          "maturity",
+          "orchestration",
+          "interface"
+        ]
+      }
+    },
+    "required_invariants": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^Z([1-9]|1[0-9]|2[0-8])$"
+      }
+    },
+    "allow_extensions": {
+      "type": "boolean"
+    },
+    "compatibility_policy": {
+      "type": "string",
+      "enum": [
+        "exact",
+        "compatible_minor",
+        "declared_mapping"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
