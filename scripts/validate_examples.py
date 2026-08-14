@@ -69,6 +69,21 @@ SCHEMA_BY_RECORD_TYPE = {
 
     "kata_handoff_record":
         SCHEMA_DIR / "kata-handoff-record.schema.json",
+
+    "zeroshiki_package_manifest":
+        SCHEMA_DIR / "zeroshiki-package-manifest.schema.json",
+
+    "conformance_profile":
+        SCHEMA_DIR / "conformance-profile.schema.json",
+
+    "kata_interface_contract":
+        SCHEMA_DIR / "kata-interface-contract.schema.json",
+
+    "kata_conformance_assessment":
+        SCHEMA_DIR / "kata-conformance-assessment.schema.json",
+
+    "kata_interoperability_assessment":
+        SCHEMA_DIR / "kata-interoperability-assessment.schema.json",
 }
 
 
@@ -87,6 +102,11 @@ ID_FIELD_BY_RECORD_TYPE = {
     "kata_selection_decision": "decision_id",
     "kata_orchestration_plan": "plan_id",
     "kata_handoff_record": "handoff_id",
+    "zeroshiki_package_manifest": "manifest_id",
+    "conformance_profile": "profile_id",
+    "kata_interface_contract": "interface_id",
+    "kata_conformance_assessment": "assessment_id",
+    "kata_interoperability_assessment": "assessment_id",
 }
 
 
@@ -198,6 +218,20 @@ def kata_ref_set(
     }
 
 
+def field_type_compatible(
+    producer_type: str,
+    consumer_type: str,
+) -> bool:
+
+    if producer_type == "any":
+        return True
+
+    if consumer_type == "any":
+        return True
+
+    return producer_type == consumer_type
+
+
 # ======================================================================
 # JSON Schema Validation
 # ======================================================================
@@ -237,7 +271,7 @@ def schema_errors(
 
 
 # ======================================================================
-# Graph Helpers
+# Generic Graph Validation
 # ======================================================================
 
 def dependency_graph_has_cycle(
@@ -577,24 +611,20 @@ def local_semantic_errors(
             "reasoning_budget_class"
         )
 
-        mapping = {
+        expected_budget = {
             "rest": "minimal",
             "kata": "bounded",
             "deep": "extended",
-        }
-
-        expected = mapping.get(
-            level
-        )
+        }.get(level)
 
         if (
-            expected is not None
-            and budget != expected
+            expected_budget is not None
+            and budget != expected_budget
         ):
             errors.append(
                 f"level {level!r} requires "
                 f"reasoning_budget_class "
-                f"{expected!r}"
+                f"{expected_budget!r}"
             )
 
 
@@ -662,8 +692,8 @@ def local_semantic_errors(
             != len(set(boundary_ids))
         ):
             errors.append(
-                "boundary_checks: boundary_id "
-                "values must be unique"
+                "boundary_checks: "
+                "boundary_id values must be unique"
             )
 
 
@@ -694,7 +724,7 @@ def local_semantic_errors(
         if rollback != from_version:
             errors.append(
                 "rollback_target_version must "
-                "equal from_version in v0.4"
+                "equal from_version in v0.5"
             )
 
         changed_steps = instance.get(
@@ -753,12 +783,10 @@ def local_semantic_errors(
 
     elif record_type == "kata_lineage":
 
-        kata_ref = instance[
-            "kata_ref"
-        ]
-
-        self_key = kata_ref_key(
-            kata_ref
+        target_key = kata_ref_key(
+            instance[
+                "kata_ref"
+            ]
         )
 
         parents = instance.get(
@@ -771,14 +799,17 @@ def local_semantic_errors(
             for parent in parents
         ]
 
-        if len(
-            parent_keys
-        ) != len(set(parent_keys)):
+        if (
+            len(parent_keys)
+            != len(set(parent_keys))
+        ):
             errors.append(
                 "parent_kata_refs must be unique"
             )
 
-        if self_key in set(parent_keys):
+        if target_key in set(
+            parent_keys
+        ):
             errors.append(
                 "KATA must not reference itself "
                 "as a parent"
@@ -794,9 +825,10 @@ def local_semantic_errors(
             for root in roots
         ]
 
-        if len(
-            root_keys
-        ) != len(set(root_keys)):
+        if (
+            len(root_keys)
+            != len(set(root_keys))
+        ):
             errors.append(
                 "root_kata_refs must be unique"
             )
@@ -864,9 +896,9 @@ def local_semantic_errors(
 
         if inherited & introduced:
             errors.append(
-                "step IDs must not appear in both "
-                "inherited_step_ids and "
-                "introduced_step_ids"
+                "step IDs must not appear "
+                "in both inherited_step_ids "
+                "and introduced_step_ids"
             )
 
 
@@ -922,9 +954,10 @@ def local_semantic_errors(
                 for component in components
             ]
 
-            if len(
-                orders
-            ) != len(set(orders)):
+            if (
+                len(orders)
+                != len(set(orders))
+            ):
                 errors.append(
                     "non-parallel composition "
                     "requires unique order values"
@@ -1141,9 +1174,10 @@ def local_semantic_errors(
             for ref in candidates
         ]
 
-        if len(
-            candidate_keys
-        ) != len(set(candidate_keys)):
+        if (
+            len(candidate_keys)
+            != len(set(candidate_keys))
+        ):
             errors.append(
                 "candidate_kata_refs must be unique"
             )
@@ -1181,17 +1215,20 @@ def local_semantic_errors(
 
         evaluation_keys = [
             kata_ref_key(
-                item["kata_ref"]
+                evaluation[
+                    "kata_ref"
+                ]
             )
-            for item in evaluations
+            for evaluation in evaluations
         ]
 
-        if len(
-            evaluation_keys
-        ) != len(set(evaluation_keys)):
+        if (
+            len(evaluation_keys)
+            != len(set(evaluation_keys))
+        ):
             errors.append(
-                "candidate_evaluations must "
-                "contain unique KATA references"
+                "candidate_evaluations must contain "
+                "unique KATA references"
             )
 
         selected_refs = instance.get(
@@ -1204,18 +1241,21 @@ def local_semantic_errors(
             for ref in selected_refs
         ]
 
-        if len(
-            selected_keys
-        ) != len(set(selected_keys)):
+        if (
+            len(selected_keys)
+            != len(set(selected_keys))
+        ):
             errors.append(
                 "selected_kata_refs must be unique"
             )
 
         evaluation_map = {
             kata_ref_key(
-                item["kata_ref"]
-            ): item
-            for item in evaluations
+                evaluation[
+                    "kata_ref"
+                ]
+            ): evaluation
+            for evaluation in evaluations
         }
 
         for selected_key in selected_keys:
@@ -1229,7 +1269,6 @@ def local_semantic_errors(
                     "selected KATA must appear "
                     "in candidate_evaluations"
                 )
-
                 continue
 
             if not evaluation[
@@ -1276,7 +1315,10 @@ def local_semantic_errors(
                     "eligible candidate requires rank"
                 )
 
-            if not eligible and exclusion is None:
+            if (
+                not eligible
+                and exclusion is None
+            ):
                 errors.append(
                     "ineligible candidate requires "
                     "exclusion_reason"
@@ -1367,9 +1409,10 @@ def local_semantic_errors(
             for stage in stages
         ]
 
-        if len(
-            stage_ids
-        ) != len(set(stage_ids)):
+        if (
+            len(stage_ids)
+            != len(set(stage_ids))
+        ):
             errors.append(
                 "stage_id values must be unique"
             )
@@ -1380,14 +1423,17 @@ def local_semantic_errors(
 
         stage_kata_keys = [
             kata_ref_key(
-                stage["kata_ref"]
+                stage[
+                    "kata_ref"
+                ]
             )
             for stage in stages
         ]
 
-        if len(
-            stage_kata_keys
-        ) != len(set(stage_kata_keys)):
+        if (
+            len(stage_kata_keys)
+            != len(set(stage_kata_keys))
+        ):
             errors.append(
                 "orchestration stages must not "
                 "repeat the same KATA/version"
@@ -1431,8 +1477,7 @@ def local_semantic_errors(
         valid_graph = {
             stage_id: {
                 dependency
-                for dependency
-                in dependencies
+                for dependency in dependencies
                 if dependency in stage_id_set
             }
             for (
@@ -1460,9 +1505,10 @@ def local_semantic_errors(
                 for stage in stages
             ]
 
-            if len(
-                orders
-            ) != len(set(orders)):
+            if (
+                len(orders)
+                != len(set(orders))
+            ):
                 errors.append(
                     "non-parallel orchestration "
                     "requires unique stage order values"
@@ -1530,6 +1576,235 @@ def local_semantic_errors(
                 "KATAs must differ"
             )
 
+
+    # ------------------------------------------------------------------
+    # ZEROSHIKI PackageManifest
+    # ------------------------------------------------------------------
+
+    elif record_type == "zeroshiki_package_manifest":
+
+        supported = instance.get(
+            "supported_record_types",
+            [],
+        )
+
+        if len(
+            supported
+        ) != len(set(supported)):
+            errors.append(
+                "supported_record_types must be unique"
+            )
+
+        profile_ids = instance.get(
+            "conformance_profile_ids",
+            [],
+        )
+
+        if len(
+            profile_ids
+        ) != len(set(profile_ids)):
+            errors.append(
+                "conformance_profile_ids must be unique"
+            )
+
+        namespaces = instance.get(
+            "extension_namespaces",
+            [],
+        )
+
+        if len(
+            namespaces
+        ) != len(set(namespaces)):
+            errors.append(
+                "extension_namespaces must be unique"
+            )
+
+
+    # ------------------------------------------------------------------
+    # ConformanceProfile
+    # ------------------------------------------------------------------
+
+    elif record_type == "conformance_profile":
+
+        record_types = instance.get(
+            "required_record_types",
+            [],
+        )
+
+        for required_type in record_types:
+
+            if (
+                required_type
+                not in SCHEMA_BY_RECORD_TYPE
+            ):
+                errors.append(
+                    "unknown required_record_type "
+                    f"{required_type!r}"
+                )
+
+
+    # ------------------------------------------------------------------
+    # KataInterfaceContract
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_interface_contract":
+
+        input_names = [
+            field["name"]
+            for field in instance.get(
+                "inputs",
+                [],
+            )
+        ]
+
+        output_names = [
+            field["name"]
+            for field in instance.get(
+                "outputs",
+                [],
+            )
+        ]
+
+        if (
+            len(input_names)
+            != len(set(input_names))
+        ):
+            errors.append(
+                "interface input field names "
+                "must be unique"
+            )
+
+        if (
+            len(output_names)
+            != len(set(output_names))
+        ):
+            errors.append(
+                "interface output field names "
+                "must be unique"
+            )
+
+
+    # ------------------------------------------------------------------
+    # KataConformanceAssessment
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_conformance_assessment":
+
+        checks = instance.get(
+            "checks",
+            [],
+        )
+
+        check_ids = [
+            check["check_id"]
+            for check in checks
+        ]
+
+        if (
+            len(check_ids)
+            != len(set(check_ids))
+        ):
+            errors.append(
+                "conformance check_id values "
+                "must be unique"
+            )
+
+        result = instance.get(
+            "result"
+        )
+
+        if result == "conformant":
+
+            if any(
+                check[
+                    "status"
+                ] == "fail"
+                for check in checks
+            ):
+                errors.append(
+                    "conformant result must not "
+                    "contain failed checks"
+                )
+
+
+    # ------------------------------------------------------------------
+    # KataInteroperabilityAssessment
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_interoperability_assessment":
+
+        producer_key = kata_ref_key(
+            instance[
+                "producer_kata_ref"
+            ]
+        )
+
+        consumer_key = kata_ref_key(
+            instance[
+                "consumer_kata_ref"
+            ]
+        )
+
+        if producer_key == consumer_key:
+            errors.append(
+                "producer and consumer KATAs "
+                "must differ"
+            )
+
+        mappings = instance.get(
+            "field_mappings",
+            [],
+        )
+
+        producer_outputs = [
+            mapping[
+                "producer_output"
+            ]
+            for mapping in mappings
+        ]
+
+        consumer_inputs = [
+            mapping[
+                "consumer_input"
+            ]
+            for mapping in mappings
+        ]
+
+        if (
+            len(producer_outputs)
+            != len(set(producer_outputs))
+        ):
+            errors.append(
+                "producer_output mappings "
+                "must be unique"
+            )
+
+        if (
+            len(consumer_inputs)
+            != len(set(consumer_inputs))
+        ):
+            errors.append(
+                "consumer_input mappings "
+                "must be unique"
+            )
+
+        checks = instance.get(
+            "compatibility_checks",
+            {},
+        )
+
+        if (
+            instance.get("decision")
+            == "compatible"
+            and not all(
+                checks.values()
+            )
+        ):
+            errors.append(
+                "compatible decision requires "
+                "all compatibility checks to pass"
+            )
+
     return errors
 
 
@@ -1556,17 +1831,14 @@ def build_registry(
             "record_type"
         )
 
-        if (
-            record_type
-            not in ID_FIELD_BY_RECORD_TYPE
-        ):
-            continue
-
         id_field = (
-            ID_FIELD_BY_RECORD_TYPE[
+            ID_FIELD_BY_RECORD_TYPE.get(
                 record_type
-            ]
+            )
         )
+
+        if id_field is None:
+            continue
 
         record_id = record.get(
             id_field
@@ -1575,7 +1847,9 @@ def build_registry(
         if record_id:
             registry[
                 record_type
-            ][record_id] = record
+            ][
+                str(record_id)
+            ] = record
 
     return registry
 
@@ -1619,7 +1893,10 @@ def registry_integrity_errors(
         )
 
         seen[key] = (
-            seen.get(key, 0)
+            seen.get(
+                key,
+                0,
+            )
             + 1
         )
 
@@ -1638,7 +1915,7 @@ def registry_integrity_errors(
 
 
 # ======================================================================
-# Lineage Graph Helpers
+# Lineage Helpers
 # ======================================================================
 
 def lineage_by_kata_ref(
@@ -1660,50 +1937,17 @@ def lineage_by_kata_ref(
         "kata_lineage"
     ].values():
 
+        key = kata_ref_key(
+            lineage[
+                "kata_ref"
+            ]
+        )
+
         result[
-            kata_ref_key(
-                lineage["kata_ref"]
-            )
+            key
         ] = lineage
 
     return result
-
-
-def lineage_target_duplicates(
-    registry: dict[
-        str,
-        dict[str, dict[str, Any]],
-    ],
-) -> set[
-    tuple[str, str]
-]:
-
-    counts: dict[
-        tuple[str, str],
-        int,
-    ] = {}
-
-    for lineage in registry[
-        "kata_lineage"
-    ].values():
-
-        key = kata_ref_key(
-            lineage["kata_ref"]
-        )
-
-        counts[key] = (
-            counts.get(key, 0)
-            + 1
-        )
-
-    return {
-        key
-        for (
-            key,
-            count,
-        ) in counts.items()
-        if count > 1
-    }
 
 
 def lineage_has_cycle(
@@ -1742,8 +1986,13 @@ def lineage_has_cycle(
         if key in visited:
             return False
 
-        visited.add(key)
-        active.add(key)
+        visited.add(
+            key
+        )
+
+        active.add(
+            key
+        )
 
         lineage = lineage_map.get(
             key
@@ -1760,14 +2009,82 @@ def lineage_has_cycle(
                     parent_ref
                 )
 
-                if visit(parent_key):
+                if visit(
+                    parent_key
+                ):
                     return True
 
-        active.remove(key)
+        active.remove(
+            key
+        )
 
         return False
 
-    return visit(start_key)
+    return visit(
+        start_key
+    )
+
+
+# ======================================================================
+# Interface Helpers
+# ======================================================================
+
+def interface_field_map(
+    interface: dict[str, Any],
+    key: str,
+) -> dict[str, dict[str, Any]]:
+
+    return {
+        field["name"]: field
+        for field in interface.get(
+            key,
+            [],
+        )
+    }
+
+
+def matching_interoperability_assessments(
+    registry: dict[
+        str,
+        dict[str, dict[str, Any]],
+    ],
+    producer_ref: dict[str, Any],
+    consumer_ref: dict[str, Any],
+) -> list[dict[str, Any]]:
+
+    producer_key = kata_ref_key(
+        producer_ref
+    )
+
+    consumer_key = kata_ref_key(
+        consumer_ref
+    )
+
+    matches = []
+
+    for assessment in registry[
+        "kata_interoperability_assessment"
+    ].values():
+
+        if (
+            kata_ref_key(
+                assessment[
+                    "producer_kata_ref"
+                ]
+            )
+            == producer_key
+            and kata_ref_key(
+                assessment[
+                    "consumer_kata_ref"
+                ]
+            )
+            == consumer_key
+        ):
+            matches.append(
+                assessment
+            )
+
+    return matches
 
 
 # ======================================================================
@@ -1847,7 +2164,6 @@ def cross_semantic_errors(
                     "unknown causal_validation_id "
                     f"{validation_id!r}"
                 )
-
                 continue
 
             if (
@@ -1885,10 +2201,12 @@ def cross_semantic_errors(
             ]
 
             if (
-                lineage_ref["kata_id"]
-                != kata_id
-                or lineage_ref["version"]
-                != version
+                lineage_ref[
+                    "kata_id"
+                ] != kata_id
+                or lineage_ref[
+                    "version"
+                ] != version
             ):
                 errors.append(
                     "lineage record targets "
@@ -1918,10 +2236,12 @@ def cross_semantic_errors(
             ]
 
             if (
-                maturity_ref["kata_id"]
-                != kata_id
-                or maturity_ref["version"]
-                != version
+                maturity_ref[
+                    "kata_id"
+                ] != kata_id
+                or maturity_ref[
+                    "version"
+                ] != version
             ):
                 errors.append(
                     "maturity assessment targets "
@@ -1953,10 +2273,12 @@ def cross_semantic_errors(
                 ]
 
                 if (
-                    output_ref["kata_id"]
-                    != kata_id
-                    or output_ref["version"]
-                    != version
+                    output_ref[
+                        "kata_id"
+                    ] != kata_id
+                    or output_ref[
+                        "version"
+                    ] != version
                 ):
                     errors.append(
                         "composition output targets "
@@ -2043,7 +2365,9 @@ def cross_semantic_errors(
         )
 
         checked = {
-            check["boundary_id"]
+            check[
+                "boundary_id"
+            ]
             for check
             in instance.get(
                 "boundary_checks",
@@ -2058,25 +2382,28 @@ def cross_semantic_errors(
                 "failure_boundary_ids"
             )
 
-        matched_actions: list[str] = []
+        matched_actions = []
 
         for check in instance.get(
             "boundary_checks",
             [],
         ):
 
+            boundary_id = check[
+                "boundary_id"
+            ]
+
             boundary = registry[
                 "failure_boundary"
             ].get(
-                check["boundary_id"]
+                boundary_id
             )
 
             if boundary is None:
                 errors.append(
                     "unknown boundary_id "
-                    f"{check['boundary_id']!r}"
+                    f"{boundary_id!r}"
                 )
-
                 continue
 
             if check[
@@ -2208,48 +2535,6 @@ def cross_semantic_errors(
                         "the KATA breathing_profile_id"
                     )
 
-            selection_id = instance.get(
-                "selection_decision_id"
-            )
-
-            if selection_id is not None:
-
-                selection = registry[
-                    "kata_selection_decision"
-                ].get(
-                    selection_id
-                )
-
-                if selection is None:
-                    errors.append(
-                        "unknown selection_decision_id "
-                        f"{selection_id!r}"
-                    )
-
-                elif (
-                    kata_id is not None
-                ):
-
-                    selected = kata_ref_set(
-                        selection.get(
-                            "selected_kata_refs",
-                            [],
-                        )
-                    )
-
-                    if not any(
-                        selected_id == kata_id
-                        for (
-                            selected_id,
-                            _,
-                        ) in selected
-                    ):
-                        errors.append(
-                            "KATA execution target "
-                            "was not selected by "
-                            "selection decision"
-                        )
-
         elif mode == "orchestrated":
 
             selection_id = instance.get(
@@ -2272,9 +2557,12 @@ def cross_semantic_errors(
                     f"{selection_id!r}"
                 )
 
-            elif selection[
-                "decision"
-            ] != "composed":
+            elif (
+                selection[
+                    "decision"
+                ]
+                != "composed"
+            ):
                 errors.append(
                     "orchestrated execution requires "
                     "selection decision 'composed'"
@@ -2303,79 +2591,6 @@ def cross_semantic_errors(
                     "a different selection decision"
                 )
 
-        elif mode == "deep":
-
-            selection_id = instance.get(
-                "selection_decision_id"
-            )
-
-            if selection_id is not None:
-
-                selection = registry[
-                    "kata_selection_decision"
-                ].get(
-                    selection_id
-                )
-
-                if selection is None:
-                    errors.append(
-                        "unknown selection_decision_id "
-                        f"{selection_id!r}"
-                    )
-
-                elif (
-                    selection["decision"]
-                    != "escalate"
-                ):
-                    errors.append(
-                        "deep execution with "
-                        "selection_decision_id requires "
-                        "selection decision 'escalate'"
-                    )
-
-
-    # ------------------------------------------------------------------
-    # CausalValidation
-    # ------------------------------------------------------------------
-
-    elif record_type == "causal_validation":
-
-        kata_id = instance.get(
-            "target_kata_id"
-        )
-
-        kata = registry[
-            "reasoning_kata"
-        ].get(
-            kata_id
-        )
-
-        if kata is not None:
-
-            target_step_id = instance.get(
-                "target_step_id"
-            )
-
-            if target_step_id is not None:
-
-                valid_steps = {
-                    step["step_id"]
-                    for step
-                    in kata.get(
-                        "reasoning_steps",
-                        [],
-                    )
-                }
-
-                if (
-                    target_step_id
-                    not in valid_steps
-                ):
-                    errors.append(
-                        "target_step_id does not "
-                        "exist in target KATA"
-                    )
-
 
     # ------------------------------------------------------------------
     # KataEvolutionRecord
@@ -2393,79 +2608,18 @@ def cross_semantic_errors(
             kata_id
         )
 
-        if kata is not None:
-
-            if (
-                kata["version"]
-                != instance["to_version"]
-            ):
-                errors.append(
-                    "to_version must match "
-                    "the current KATA version"
-                )
-
-        for validation_id in instance.get(
-            "causal_validation_ids",
-            [],
+        if (
+            kata is not None
+            and kata[
+                "version"
+            ] != instance[
+                "to_version"
+            ]
         ):
-
-            validation = registry[
-                "causal_validation"
-            ].get(
-                validation_id
+            errors.append(
+                "to_version must match "
+                "the current KATA version"
             )
-
-            if validation is None:
-                errors.append(
-                    "unknown causal_validation_id "
-                    f"{validation_id!r}"
-                )
-
-                continue
-
-            if (
-                validation[
-                    "target_kata_id"
-                ]
-                != kata_id
-            ):
-                errors.append(
-                    f"causal validation "
-                    f"{validation_id!r} "
-                    "targets a different KATA"
-                )
-
-        for assessment_id in instance.get(
-            "applicability_assessment_ids",
-            [],
-        ):
-
-            assessment = registry[
-                "applicability_assessment"
-            ].get(
-                assessment_id
-            )
-
-            if assessment is None:
-                errors.append(
-                    "unknown "
-                    "applicability_assessment_id "
-                    f"{assessment_id!r}"
-                )
-
-                continue
-
-            if (
-                assessment[
-                    "kata_id"
-                ]
-                != kata_id
-            ):
-                errors.append(
-                    f"applicability assessment "
-                    f"{assessment_id!r} "
-                    "targets a different KATA"
-                )
 
 
     # ------------------------------------------------------------------
@@ -2474,30 +2628,13 @@ def cross_semantic_errors(
 
     elif record_type == "kata_lineage":
 
-        target_key = kata_ref_key(
-            instance[
-                "kata_ref"
-            ]
-        )
-
-        duplicate_targets = (
-            lineage_target_duplicates(
-                registry
-            )
-        )
-
-        if target_key in duplicate_targets:
-            errors.append(
-                "multiple KataLineage records "
-                "target the same KATA/version"
-            )
-
         if lineage_has_cycle(
             instance,
             registry,
         ):
             errors.append(
-                "KATA lineage graph must be acyclic"
+                "KATA lineage graph "
+                "must be acyclic"
             )
 
         kata_ref = instance[
@@ -2515,12 +2652,17 @@ def cross_semantic_errors(
         if kata is not None:
 
             if (
-                kata["version"]
-                != kata_ref["version"]
+                kata[
+                    "version"
+                ]
+                != kata_ref[
+                    "version"
+                ]
             ):
                 errors.append(
-                    "lineage kata_ref version does "
-                    "not match ReasoningKATA version"
+                    "lineage kata_ref version "
+                    "does not match "
+                    "ReasoningKATA version"
                 )
 
             if (
@@ -2535,21 +2677,6 @@ def cross_semantic_errors(
                     "ReasoningKATA lineage_id "
                     "does not reference "
                     "this lineage record"
-                )
-
-            if (
-                instance.get(
-                    "derivation_type"
-                )
-                == "composition"
-                and not kata.get(
-                    "composition_id"
-                )
-            ):
-                errors.append(
-                    "composition lineage requires "
-                    "the target KATA to reference "
-                    "a composition"
                 )
 
 
@@ -2574,8 +2701,12 @@ def cross_semantic_errors(
         if kata is not None:
 
             if (
-                kata["version"]
-                != output_ref["version"]
+                kata[
+                    "version"
+                ]
+                != output_ref[
+                    "version"
+                ]
             ):
                 errors.append(
                     "composition output version "
@@ -2621,7 +2752,9 @@ def cross_semantic_errors(
         if kata is not None:
 
             if (
-                kata["version"]
+                kata[
+                    "version"
+                ]
                 != kata_ref[
                     "version"
                 ]
@@ -2663,7 +2796,6 @@ def cross_semantic_errors(
                     "unknown causal_validation_id "
                     f"{validation_id!r}"
                 )
-
                 continue
 
             if (
@@ -2694,8 +2826,7 @@ def cross_semantic_errors(
             ):
                 errors.append(
                     f"{instance['level']} requires "
-                    "supported causal validation "
-                    "records"
+                    "supported causal validation records"
                 )
 
 
@@ -2720,7 +2851,6 @@ def cross_semantic_errors(
                 "unknown kata selection request "
                 f"{request_id!r}"
             )
-
             return errors
 
         requested_candidates = kata_ref_set(
@@ -2764,9 +2894,10 @@ def cross_semantic_errors(
             "max_selected_katas"
         ]
 
-        if len(
-            selected
-        ) > max_selected:
+        if (
+            len(selected)
+            > max_selected
+        ):
             errors.append(
                 "selected KATA count exceeds "
                 "max_selected_katas"
@@ -2824,31 +2955,16 @@ def cross_semantic_errors(
                         f"{applicability_id!r}"
                     )
 
-                else:
-
-                    if (
-                        applicability[
-                            "kata_id"
-                        ]
-                        != key[0]
-                    ):
-                        errors.append(
-                            "applicability assessment "
-                            "targets a different "
-                            "candidate KATA"
-                        )
-
-                    if (
-                        applicability[
-                            "decision"
-                        ]
-                        != "reuse"
-                    ):
-                        errors.append(
-                            "selected KATA requires "
-                            "applicability decision "
-                            "'reuse'"
-                        )
+                elif (
+                    applicability[
+                        "decision"
+                    ]
+                    != "reuse"
+                ):
+                    errors.append(
+                        "selected KATA requires "
+                        "applicability decision 'reuse'"
+                    )
 
             maturity_id = evaluation.get(
                 "maturity_assessment_id"
@@ -2906,33 +3022,6 @@ def cross_semantic_errors(
                                 "meet minimum maturity "
                                 f"{minimum_maturity}"
                             )
-
-        selected_compute = instance.get(
-            "selected_breathing_level"
-        )
-
-        maximum_compute = request[
-            "constraints"
-        ][
-            "maximum_compute_level"
-        ]
-
-        if (
-            selected_compute
-            in COMPUTE_LEVEL_RANK
-            and maximum_compute
-            in COMPUTE_LEVEL_RANK
-            and COMPUTE_LEVEL_RANK[
-                selected_compute
-            ]
-            > COMPUTE_LEVEL_RANK[
-                maximum_compute
-            ]
-        ):
-            errors.append(
-                "selected breathing level exceeds "
-                "maximum_compute_level"
-            )
 
 
     # ------------------------------------------------------------------
@@ -2997,8 +3086,8 @@ def cross_semantic_errors(
                     ]
                 ):
                     errors.append(
-                        "orchestration strategy "
-                        "must match source composition"
+                        "orchestration strategy must "
+                        "match source composition"
                     )
 
                 if (
@@ -3058,28 +3147,6 @@ def cross_semantic_errors(
                         "components"
                     )
 
-                if decision is not None:
-
-                    selected = kata_ref_set(
-                        decision.get(
-                            "selected_kata_refs",
-                            [],
-                        )
-                    )
-
-                    output_key = kata_ref_key(
-                        composition[
-                            "output_kata_ref"
-                        ]
-                    )
-
-                    if output_key not in selected:
-                        errors.append(
-                            "source composition output "
-                            "KATA must be selected by "
-                            "the selection decision"
-                        )
-
 
     # ------------------------------------------------------------------
     # KataHandoffRecord
@@ -3102,7 +3169,6 @@ def cross_semantic_errors(
                 "unknown orchestration plan "
                 f"{plan_id!r}"
             )
-
             return errors
 
         stages = {
@@ -3233,6 +3299,561 @@ def cross_semantic_errors(
                 "destination input_contract"
             )
 
+        # v0.5:
+        # Compatibility Before Handoff
+
+        matching = (
+            matching_interoperability_assessments(
+                registry,
+                from_stage[
+                    "kata_ref"
+                ],
+                to_stage[
+                    "kata_ref"
+                ],
+            )
+        )
+
+        compatible = [
+            assessment
+            for assessment in matching
+            if assessment.get(
+                "decision"
+            ) == "compatible"
+        ]
+
+        if not compatible:
+            errors.append(
+                "handoff requires a compatible "
+                "KataInteroperabilityAssessment"
+            )
+
+
+    # ------------------------------------------------------------------
+    # ZEROSHIKI PackageManifest
+    # ------------------------------------------------------------------
+
+    elif record_type == "zeroshiki_package_manifest":
+
+        supported = set(
+            instance[
+                "supported_record_types"
+            ]
+        )
+
+        for record_name in supported:
+
+            if (
+                record_name
+                not in SCHEMA_BY_RECORD_TYPE
+            ):
+                errors.append(
+                    "manifest declares unknown "
+                    "record type "
+                    f"{record_name!r}"
+                )
+
+        for profile_id in instance[
+            "conformance_profile_ids"
+        ]:
+
+            profile = registry[
+                "conformance_profile"
+            ].get(
+                profile_id
+            )
+
+            if profile is None:
+                errors.append(
+                    "unknown conformance_profile_id "
+                    f"{profile_id!r}"
+                )
+                continue
+
+            required = set(
+                profile[
+                    "required_record_types"
+                ]
+            )
+
+            missing = (
+                required
+                - supported
+            )
+
+            if missing:
+                errors.append(
+                    "manifest does not support "
+                    "profile-required record types: "
+                    + ", ".join(
+                        sorted(
+                            missing
+                        )
+                    )
+                )
+
+
+    # ------------------------------------------------------------------
+    # ConformanceProfile
+    # ------------------------------------------------------------------
+
+    elif record_type == "conformance_profile":
+
+        for record_name in instance[
+            "required_record_types"
+        ]:
+
+            if (
+                record_name
+                not in SCHEMA_BY_RECORD_TYPE
+            ):
+                errors.append(
+                    "unknown profile-required "
+                    "record type "
+                    f"{record_name!r}"
+                )
+
+
+    # ------------------------------------------------------------------
+    # KataInterfaceContract
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_interface_contract":
+
+        kata_ref = instance[
+            "kata_ref"
+        ]
+
+        kata = registry[
+            "reasoning_kata"
+        ].get(
+            kata_ref[
+                "kata_id"
+            ]
+        )
+
+        # External KATA references are permitted.
+        # If the KATA exists locally, the version
+        # MUST agree with the contract.
+
+        if (
+            kata is not None
+            and kata[
+                "version"
+            ] != kata_ref[
+                "version"
+            ]
+        ):
+            errors.append(
+                "interface contract KATA version "
+                "does not match local ReasoningKATA"
+            )
+
+
+    # ------------------------------------------------------------------
+    # KataConformanceAssessment
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_conformance_assessment":
+
+        profile_id = instance[
+            "profile_id"
+        ]
+
+        profile = registry[
+            "conformance_profile"
+        ].get(
+            profile_id
+        )
+
+        if profile is None:
+            errors.append(
+                "unknown conformance profile "
+                f"{profile_id!r}"
+            )
+            return errors
+
+        interface_id = instance[
+            "interface_id"
+        ]
+
+        interface = registry[
+            "kata_interface_contract"
+        ].get(
+            interface_id
+        )
+
+        if interface is None:
+            errors.append(
+                "unknown interface_id "
+                f"{interface_id!r}"
+            )
+
+        else:
+
+            if (
+                kata_ref_key(
+                    interface[
+                        "kata_ref"
+                    ]
+                )
+                != kata_ref_key(
+                    instance[
+                        "kata_ref"
+                    ]
+                )
+            ):
+                errors.append(
+                    "interface contract targets "
+                    "a different KATA/version"
+                )
+
+        required_checks = set(
+            profile[
+                "required_checks"
+            ]
+        )
+
+        observed_checks = {
+            check[
+                "check_id"
+            ]: check
+            for check
+            in instance[
+                "checks"
+            ]
+        }
+
+        for check_id in required_checks:
+
+            check = observed_checks.get(
+                check_id
+            )
+
+            if check is None:
+                errors.append(
+                    "missing required conformance "
+                    f"check {check_id!r}"
+                )
+
+            elif (
+                instance[
+                    "result"
+                ]
+                == "conformant"
+                and check[
+                    "status"
+                ]
+                != "pass"
+            ):
+                errors.append(
+                    "conformant result requires all "
+                    "required checks to pass"
+                )
+
+        if (
+            instance[
+                "result"
+            ]
+            == "non_conformant"
+        ):
+
+            failing_required = any(
+                (
+                    check_id
+                    not in observed_checks
+                )
+                or (
+                    observed_checks[
+                        check_id
+                    ][
+                        "status"
+                    ]
+                    != "pass"
+                )
+                for check_id
+                in required_checks
+            )
+
+            if not failing_required:
+                errors.append(
+                    "non_conformant result requires "
+                    "at least one failed or missing "
+                    "required check"
+                )
+
+
+    # ------------------------------------------------------------------
+    # KataInteroperabilityAssessment
+    # ------------------------------------------------------------------
+
+    elif record_type == "kata_interoperability_assessment":
+
+        producer_interface_id = instance[
+            "producer_interface_id"
+        ]
+
+        consumer_interface_id = instance[
+            "consumer_interface_id"
+        ]
+
+        producer_interface = registry[
+            "kata_interface_contract"
+        ].get(
+            producer_interface_id
+        )
+
+        consumer_interface = registry[
+            "kata_interface_contract"
+        ].get(
+            consumer_interface_id
+        )
+
+        if producer_interface is None:
+            errors.append(
+                "unknown producer_interface_id "
+                f"{producer_interface_id!r}"
+            )
+
+        if consumer_interface is None:
+            errors.append(
+                "unknown consumer_interface_id "
+                f"{consumer_interface_id!r}"
+            )
+
+        if (
+            producer_interface is None
+            or consumer_interface is None
+        ):
+            return errors
+
+        producer_ref = instance[
+            "producer_kata_ref"
+        ]
+
+        consumer_ref = instance[
+            "consumer_kata_ref"
+        ]
+
+        version_compatible = True
+
+        if (
+            kata_ref_key(
+                producer_interface[
+                    "kata_ref"
+                ]
+            )
+            != kata_ref_key(
+                producer_ref
+            )
+        ):
+            errors.append(
+                "producer interface targets "
+                "a different KATA/version"
+            )
+
+            version_compatible = False
+
+        if (
+            kata_ref_key(
+                consumer_interface[
+                    "kata_ref"
+                ]
+            )
+            != kata_ref_key(
+                consumer_ref
+            )
+        ):
+            errors.append(
+                "consumer interface targets "
+                "a different KATA/version"
+            )
+
+            version_compatible = False
+
+        producer_outputs = (
+            interface_field_map(
+                producer_interface,
+                "outputs",
+            )
+        )
+
+        consumer_inputs = (
+            interface_field_map(
+                consumer_interface,
+                "inputs",
+            )
+        )
+
+        mappings = instance.get(
+            "field_mappings",
+            [],
+        )
+
+        mapped_consumer_inputs = set()
+
+        mapping_type_compatible = True
+
+        mapping_names_valid = True
+
+        for mapping in mappings:
+
+            producer_name = mapping[
+                "producer_output"
+            ]
+
+            consumer_name = mapping[
+                "consumer_input"
+            ]
+
+            producer_field = (
+                producer_outputs.get(
+                    producer_name
+                )
+            )
+
+            consumer_field = (
+                consumer_inputs.get(
+                    consumer_name
+                )
+            )
+
+            if producer_field is None:
+                errors.append(
+                    "field mapping references "
+                    "unknown producer output "
+                    f"{producer_name!r}"
+                )
+
+                mapping_names_valid = False
+
+            if consumer_field is None:
+                errors.append(
+                    "field mapping references "
+                    "unknown consumer input "
+                    f"{consumer_name!r}"
+                )
+
+                mapping_names_valid = False
+
+            if (
+                producer_field is None
+                or consumer_field is None
+            ):
+                mapping_type_compatible = False
+                continue
+
+            mapped_consumer_inputs.add(
+                consumer_name
+            )
+
+            if not field_type_compatible(
+                producer_field[
+                    "field_type"
+                ],
+                consumer_field[
+                    "field_type"
+                ],
+            ):
+                mapping_type_compatible = False
+
+        required_consumer_inputs = {
+            name
+            for (
+                name,
+                field,
+            ) in consumer_inputs.items()
+            if field[
+                "required"
+            ]
+        }
+
+        required_inputs_satisfied = (
+            required_consumer_inputs
+            .issubset(
+                mapped_consumer_inputs
+            )
+        )
+
+        type_compatible = (
+            mapping_names_valid
+            and mapping_type_compatible
+        )
+
+        trace_preserved = (
+            producer_interface.get(
+                "trace_required"
+            )
+            is True
+            and consumer_interface.get(
+                "trace_required"
+            )
+            is True
+            and bool(
+                instance.get(
+                    "evidence_trace_ids"
+                )
+            )
+        )
+
+        declared = instance[
+            "compatibility_checks"
+        ]
+
+        derived = {
+            "required_inputs_satisfied":
+                required_inputs_satisfied,
+
+            "type_compatible":
+                type_compatible,
+
+            "version_compatible":
+                version_compatible,
+
+            "trace_preserved":
+                trace_preserved,
+        }
+
+        for key, value in derived.items():
+
+            if declared[
+                key
+            ] != value:
+                errors.append(
+                    f"compatibility check "
+                    f"{key!r} does not match "
+                    f"derived value {value!r}"
+                )
+
+        all_compatible = all(
+            derived.values()
+        )
+
+        if (
+            instance[
+                "decision"
+            ]
+            == "compatible"
+            and not all_compatible
+        ):
+            errors.append(
+                "compatible decision requires "
+                "all derived compatibility "
+                "checks to pass"
+            )
+
+        if (
+            instance[
+                "decision"
+            ]
+            == "incompatible"
+            and all_compatible
+        ):
+            errors.append(
+                "incompatible decision requires "
+                "at least one compatibility failure"
+            )
+
     return errors
 
 
@@ -3285,7 +3906,7 @@ def main() -> int:
 
     print(
         "=== ZEROSHIKI Reasoning OS "
-        "v0.4 Validation ==="
+        "v0.5 Validation ==="
     )
 
     schemas: dict[
@@ -3295,7 +3916,7 @@ def main() -> int:
 
 
     # ------------------------------------------------------------------
-    # Schema Validation
+    # Load Schemas
     # ------------------------------------------------------------------
 
     for (
@@ -3343,7 +3964,7 @@ def main() -> int:
 
 
     # ------------------------------------------------------------------
-    # Load examples
+    # Load Example Paths
     # ------------------------------------------------------------------
 
     pass_paths = iter_examples(
@@ -3353,6 +3974,11 @@ def main() -> int:
     fail_paths = iter_examples(
         FAIL_DIR
     )
+
+
+    # ------------------------------------------------------------------
+    # Build Registry
+    # ------------------------------------------------------------------
 
     pass_records = (
         collect_locally_valid_records(
@@ -3364,11 +3990,6 @@ def main() -> int:
     registry = build_registry(
         pass_records
     )
-
-
-    # ------------------------------------------------------------------
-    # Registry Integrity
-    # ------------------------------------------------------------------
 
     registry_errors = (
         registry_integrity_errors(
@@ -3468,7 +4089,7 @@ def main() -> int:
 
 
     # ------------------------------------------------------------------
-    # Registry Errors
+    # Registry Integrity
     # ------------------------------------------------------------------
 
     if registry_errors:
@@ -3480,7 +4101,6 @@ def main() -> int:
         )
 
         for error in registry_errors:
-
             print(
                 f"- {error}"
             )
