@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "zeroshiki-package-manifest.schema.json",
+  "title": "ZEROSHIKI PackageManifest v0.5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "manifest_id",
+    "spec_version",
+    "implementation_id",
+    "supported_record_types",
+    "conformance_profile_ids",
+    "extension_namespaces",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "record_type": {
+      "const": "zeroshiki_package_manifest"
+    },
+    "manifest_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "spec_version": {
+      "const": "0.5.0"
+    },
+    "implementation_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "supported_record_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    },
+    "conformance_profile_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 128
+      }
+    },
+    "extension_namespaces": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
