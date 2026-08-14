@@ -1,0 +1,37 @@
+schema_version: "0.5.0"
+record_type: kata_interface_contract
+
+interface_id: interface.origin-identification.v1
+interface_version: "1.0.0"
+
+kata_ref:
+  kata_id: kata.origin-identification.v1
+  version: "1.0.0"
+
+inputs:
+  - name: source_material
+    field_type: object
+    required: true
+
+outputs:
+  - name: origin_candidate
+    field_type: object
+    required: true
+
+  - name: origin_evidence
+    field_type: object
+    required: true
+
+preconditions:
+  - Source material is available.
+
+postconditions:
+  - Origin candidate has supporting evidence.
+
+failure_signals:
+  - origin_not_identifiable
+  - insufficient_evidence
+
+trace_required: true
+
+created_at: "2026-08-14T11:01:00+09:00"
