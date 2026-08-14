@@ -1,0 +1,35 @@
+schema_version: "0.5.0"
+record_type: kata_interoperability_assessment
+
+assessment_id: interop.origin-to-trace.001
+
+producer_kata_ref:
+  kata_id: kata.origin-identification.v1
+  version: "1.0.0"
+
+consumer_kata_ref:
+  kata_id: kata.trace-verification.v1
+  version: "1.0.0"
+
+producer_interface_id: interface.origin-identification.v1
+consumer_interface_id: interface.trace-verification.v1
+
+field_mappings:
+  - producer_output: origin_candidate
+    consumer_input: origin_candidate
+
+  - producer_output: origin_evidence
+    consumer_input: origin_evidence
+
+compatibility_checks:
+  required_inputs_satisfied: true
+  type_compatible: true
+  version_compatible: true
+  trace_preserved: true
+
+evidence_trace_ids:
+  - trace.origin-analysis.20260813.001
+
+decision: compatible
+
+created_at: "2026-08-14T11:03:00+09:00"
