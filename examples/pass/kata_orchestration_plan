@@ -1,0 +1,68 @@
+schema_version: "0.4.0"
+record_type: kata_orchestration_plan
+
+plan_id: orchestration.origin-trace-royalty.001
+
+selection_decision_id: selection-decision.origin-analysis.001
+
+source_composition_id: composition.origin-trace-royalty.001
+
+execution_strategy: sequential
+
+stages:
+  - stage_id: stage.origin
+    kata_ref:
+      kata_id: kata.origin-identification.v1
+      version: "1.0.0"
+
+    order: 1
+    depends_on: []
+
+    input_contract:
+      - source_material
+
+    output_contract:
+      - origin_candidate
+      - origin_evidence
+
+    on_failure: escalate_to_deep
+
+  - stage_id: stage.trace
+    kata_ref:
+      kata_id: kata.trace-verification.v1
+      version: "1.0.0"
+
+    order: 2
+    depends_on:
+      - stage.origin
+
+    input_contract:
+      - origin_candidate
+      - origin_evidence
+
+    output_contract:
+      - verified_trace
+
+    on_failure: escalate_to_deep
+
+  - stage_id: stage.royalty
+    kata_ref:
+      kata_id: kata.value-return-map.v1
+      version: "1.0.0"
+
+    order: 3
+    depends_on:
+      - stage.trace
+
+    input_contract:
+      - verified_trace
+
+    output_contract:
+      - value_return_map
+
+    on_failure: escalate_to_deep
+
+conflict_policy: escalate_to_deep
+fallback_policy: escalate_to_deep
+
+created_at: "2026-08-13T10:32:00+09:00"
