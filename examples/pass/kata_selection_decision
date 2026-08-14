@@ -1,0 +1,43 @@
+schema_version: "0.4.0"
+record_type: kata_selection_decision
+
+decision_id: selection-decision.origin-analysis.001
+request_id: selection-request.origin-analysis.001
+
+candidate_evaluations:
+  - kata_ref:
+      kata_id: kata.origin-trace-royalty.v2
+      version: "2.0.0"
+
+    eligible: true
+    boundary_blocked: false
+    applicability_assessment_id: applicability.origin-analysis.001
+    maturity_assessment_id: maturity.origin-trace-royalty.001
+    rank: 1
+    exclusion_reason: null
+
+  - kata_ref:
+      kata_id: kata.generic-analysis.v1
+      version: "1.0.0"
+
+    eligible: false
+    boundary_blocked: false
+    applicability_assessment_id: null
+    maturity_assessment_id: null
+    rank: null
+    exclusion_reason: insufficient_evidence
+
+decision: composed
+
+selected_kata_refs:
+  - kata_id: kata.origin-trace-royalty.v2
+    version: "2.0.0"
+
+selected_breathing_level: kata
+
+reason: >
+  The Origin-Trace-Royalty KATA passed applicability
+  checks, has K3 maturity, and contains a defined
+  three-component composition.
+
+created_at: "2026-08-13T10:31:00+09:00"
