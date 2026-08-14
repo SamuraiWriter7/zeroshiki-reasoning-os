@@ -1,0 +1,29 @@
+schema_version: "0.4.0"
+record_type: kata_selection_decision
+
+decision_id: selection-decision.invalid.ineligible.001
+request_id: selection-request.origin-analysis.001
+
+candidate_evaluations:
+  - kata_ref:
+      kata_id: kata.origin-trace-royalty.v2
+      version: "2.0.0"
+
+    eligible: false
+    boundary_blocked: true
+    applicability_assessment_id: applicability.origin-analysis.001
+    maturity_assessment_id: maturity.origin-trace-royalty.001
+    rank: 1
+    exclusion_reason: boundary_blocked
+
+decision: single
+
+selected_kata_refs:
+  - kata_id: kata.origin-trace-royalty.v2
+    version: "2.0.0"
+
+selected_breathing_level: kata
+
+reason: Invalid selection.
+
+created_at: "2026-08-13T10:40:00+09:00"
