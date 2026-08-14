@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-interoperability-assessment.schema.json",
+  "title": "ZEROSHIKI KataInteroperabilityAssessment v0.5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "assessment_id",
+    "producer_kata_ref",
+    "consumer_kata_ref",
+    "producer_interface_id",
+    "consumer_interface_id",
+    "field_mappings",
+    "compatibility_checks",
+    "evidence_trace_ids",
+    "decision",
+    "created_at"
+  ],
+  "$defs": {
+    "kata_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kata_id",
+        "version"
+      ],
+      "properties": {
+        "kata_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "record_type": {
+      "const": "kata_interoperability_assessment"
+    },
+    "assessment_id": {
+      "type": "string"
+    },
+    "producer_kata_ref": {
+      "$ref": "#/$defs/kata_ref"
+    },
+    "consumer_kata_ref": {
+      "$ref": "#/$defs/kata_ref"
+    },
+    "producer_interface_id": {
+      "type": "string"
+    },
+    "consumer_interface_id": {
+      "type": "string"
+    },
+    "field_mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "producer_output",
+          "consumer_input"
+        ],
+        "properties": {
+          "producer_output": {
+            "type": "string"
+          },
+          "consumer_input": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compatibility_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_inputs_satisfied",
+        "type_compatible",
+        "version_compatible",
+        "trace_preserved"
+      ],
+      "properties": {
+        "required_inputs_satisfied": {
+          "type": "boolean"
+        },
+        "type_compatible": {
+          "type": "boolean"
+        },
+        "version_compatible": {
+          "type": "boolean"
+        },
+        "trace_preserved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evidence_trace_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "compatible",
+        "incompatible"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
